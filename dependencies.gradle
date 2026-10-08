@@ -38,12 +38,12 @@ dependencies {
     runtimeOnlyNonPublishable("org.fentanylsolutions.fentlib:FentLib:0.0.55")
     runtimeOnlyNonPublishable("curse.maven:archaicfix-677782:6785842")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNHLib:0.11.52:dev")
-    runtimeOnlyNonPublishable(rfg.deobf("curse.maven:catalogue-vintage-1465746:7695645")) // 1.0.2-1.7.10
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.2.30:dev")
     runtimeOnlyNonPublishable(rfg.deobf("curse.maven:xaeros-minimap-263420:6012805"))
     runtimeOnlyNonPublishable(rfg.deobf("com.github.mist475:Sound-Physics:1.1.1")) {
         exclude group: "io.github.legacymoddingmc", module: "unimixins"
     }
+    runtimeOnlyNonPublishable(rfg.deobf("curse.maven:catalogue-vintage-1465746:8384975")) // 1.0.8-1.7.10
 
     // implementation "mcp.mobius.waila:Waila:1.5.10_1.7.10"
     // implementation(rfg.deobf("maven.modrinth:village-names:dbqnvxNP"))
