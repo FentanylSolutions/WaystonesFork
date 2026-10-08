@@ -34,12 +34,12 @@
  * For more details, see https://docs.gradle.org/8.0.1/userguide/java_library_plugin.html#sec:java_library_configurations_graph
  */
 dependencies {
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.8.102-GTNH:dev")
-    runtimeOnlyNonPublishable("org.fentanylsolutions.fentlib:FentLib:0.0.49")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.8.158-GTNH:dev")
+    runtimeOnlyNonPublishable("org.fentanylsolutions.fentlib:FentLib:0.0.55")
     runtimeOnlyNonPublishable("curse.maven:archaicfix-677782:6785842")
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNHLib:0.11.13:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNHLib:0.11.52:dev")
     runtimeOnlyNonPublishable(rfg.deobf("curse.maven:catalogue-vintage-1465746:7695645")) // 1.0.2-1.7.10
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.1.35:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.2.30:dev")
     runtimeOnlyNonPublishable(rfg.deobf("curse.maven:xaeros-minimap-263420:6012805"))
     runtimeOnlyNonPublishable(rfg.deobf("com.github.mist475:Sound-Physics:1.1.1")) {
         exclude group: "io.github.legacymoddingmc", module: "unimixins"
