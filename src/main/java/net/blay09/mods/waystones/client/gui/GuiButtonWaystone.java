@@ -69,7 +69,8 @@ public class GuiButtonWaystone extends GuiButton {
         refreshEnabledState();
         super.drawButton(mc, mouseX, mouseY);
 
-        if (Waystones.getConfig().xpBaseCost > -1 && !Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode) {
+        if (!parentGui.isFree() && Waystones.getConfig().xpBaseCost > -1
+            && !Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode) {
             // Cost
             int color = (Minecraft.getMinecraft().thePlayer.experienceLevel >= xpCost) ? 0x36A336 : 0xFF5555;// 0x55FF55
                                                                                                              // :
@@ -215,13 +216,13 @@ public class GuiButtonWaystone extends GuiButton {
                 this.enabled = false;
             }
 
-            if (Waystones.getConfig().xpBaseCost > -1 && Minecraft.getMinecraft().thePlayer.experienceLevel < xpCost) {
+            if (!parentGui.isFree() && Waystones.getConfig().xpBaseCost > -1
+                && Minecraft.getMinecraft().thePlayer.experienceLevel < xpCost) {
                 this.enabled = false;
             }
-
-            if (!PlayerWaystoneData.canUseWarpStone(Minecraft.getMinecraft().thePlayer, waystone)) {
-                this.enabled = false;
-            }
+        }
+        if (!parentGui.canWarpTo(waystone)) {
+            this.enabled = false;
         }
     }
 

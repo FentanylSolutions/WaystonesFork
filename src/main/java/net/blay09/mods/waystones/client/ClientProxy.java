@@ -94,10 +94,10 @@ public class ClientProxy extends CommonProxy {
     public void onDrawScreen(GuiScreenEvent.DrawScreenEvent.Post event) {
         if (event.gui instanceof GuiInventory && buttonWarp != null && buttonWarp.isHovered()) {
             tmpTooltip.clear();
-            long timeSince = System.currentTimeMillis() - PlayerWaystoneData.getLastFreeWarp(
+            long remaining = PlayerWaystoneData.getFreeWarpCooldownRemaining(
                 FMLClientHandler.instance()
                     .getClientPlayerEntity());
-            int secondsLeft = (int) ((Waystones.getConfig().warpStoneCooldown * 1000 - timeSince) / 1000);
+            int secondsLeft = (int) ((remaining + 999L) / 1000L);
             if (Waystones.getConfig().teleportButtonReturnOnly) {
                 tmpTooltip.add(EnumChatFormatting.YELLOW + I18n.format("tooltip.waystones:returnToWaystone"));
                 WaystoneEntry lastEntry = PlayerWaystoneData.getLastWaystone(
@@ -214,10 +214,7 @@ public class ClientProxy extends CommonProxy {
         if (player == null || player.capabilities.isCreativeMode) {
             return (int) (maxLightLevel * 15f);
         }
-        long lastUse = PlayerWaystoneData.getLastWarpStoneUse(player);
-        long cooldown = Waystones.getConfig().warpStoneCooldown * 1000L;
-        long timeSince = System.currentTimeMillis() - lastUse;
-        float progress = Math.min(1f, Math.max(0f, (float) timeSince / cooldown));
+        float progress = PlayerWaystoneData.getWarpStoneCooldownProgress(player);
         return (int) (progress * maxLightLevel * 15f);
     }
 

@@ -105,10 +105,7 @@ public class RenderWaystone extends TileEntitySpecialRenderer {
             return 1f;
         }
 
-        long lastUse = PlayerWaystoneData.getLastWarpStoneUse(Minecraft.getMinecraft().thePlayer);
-        long cooldown = Waystones.getConfig().warpStoneCooldown * 1000L;
-        long timeSince = System.currentTimeMillis() - lastUse;
-        return Math.min(1f, Math.max(0f, (float) timeSince / cooldown));
+        return PlayerWaystoneData.getWarpStoneCooldownProgress(Minecraft.getMinecraft().thePlayer);
     }
 
     @Override

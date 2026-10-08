@@ -14,6 +14,7 @@ import net.blay09.mods.waystones.network.NetworkHandler;
 import net.blay09.mods.waystones.network.message.MessageUnlearnWaystone;
 import net.blay09.mods.waystones.network.message.MessageWarpStone;
 import net.blay09.mods.waystones.util.ClientUtil;
+import net.blay09.mods.waystones.util.WaystoneCooldown;
 import net.blay09.mods.waystones.util.WaystoneEntry;
 import net.blay09.mods.waystones.util.WaystoneXpCost;
 import net.minecraft.client.Minecraft;
@@ -141,7 +142,7 @@ public class GuiWarpStone extends GuiScreen {
                 continue;
             }
             int xpCost = -1;
-            if (!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode) {
+            if (!isFree && !Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode) {
                 xpCost = WaystoneXpCost.getXpCost(currentWaystone, entries[i], Minecraft.getMinecraft().thePlayer);
             }
             GuiButtonWaystone btnWaystone = new GuiButtonWaystone(
@@ -152,23 +153,7 @@ public class GuiWarpStone extends GuiScreen {
                 xpCost,
                 this);
 
-            if (!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode) {
-                if (entries[i].getDimensionId() != Minecraft.getMinecraft().theWorld.provider.dimensionId) {
-                    if (!WaystoneManager.isDimensionWarpAllowed(entries[i])) {
-                        btnWaystone.enabled = false;
-                    }
-                }
-
-                if (Waystones.getConfig().xpBaseCost > -1) {
-                    if (Minecraft.getMinecraft().thePlayer.experienceLevel < xpCost) {
-                        btnWaystone.enabled = false;
-                    }
-                }
-
-                if (!PlayerWaystoneData.canUseWarpStone(Minecraft.getMinecraft().thePlayer, entries[i])) {
-                    btnWaystone.enabled = false;
-                }
-            }
+            btnWaystone.refreshEnabledState();
 
             lstEntries.add(btnWaystone);
             y += 22;
@@ -325,7 +310,7 @@ public class GuiWarpStone extends GuiScreen {
         GL11.glPopMatrix();
 
         drawRect(width / 2 - 50, height / 2 - 50, width / 2 + 50, height / 2 + 50, 0xFFFFFF);
-        if (PlayerWaystoneData.canUseWarpStone(Minecraft.getMinecraft().thePlayer) || hasCooldownBypassWaystone()) {
+        if (canWarpTo(null) || hasCooldownBypassWaystone()) {
             drawCenteredString(
                 fontRendererObj,
                 I18n.format("gui.waystones:warpStone.selectDestination"),
@@ -342,13 +327,17 @@ public class GuiWarpStone extends GuiScreen {
                 cantWarpStrWidth + 4,
                 14,
                 0x32FFFFFF);
-            float ratio = (float) (Waystones.getConfig().warpStoneCooldown * 1000L) / (System.currentTimeMillis()
-                - PlayerWaystoneData.getLastWarpStoneUse(Minecraft.getMinecraft().thePlayer));
+            float progress = isFree
+                ? WaystoneCooldown.getProgress(
+                    PlayerWaystoneData.getLastFreeWarp(Minecraft.getMinecraft().thePlayer),
+                    Waystones.getConfig().teleportButtonCooldown,
+                    System.currentTimeMillis())
+                : PlayerWaystoneData.getWarpStoneCooldownProgress(Minecraft.getMinecraft().thePlayer);
             ClientUtil.drawSolidRect(
                 Tessellator.instance,
                 (double) width / 2 - (double) cantWarpStrWidth / 2 - 2,
                 (double) height / 2 - 88,
-                (cantWarpStrWidth + 4) / ratio,
+                (cantWarpStrWidth + 4) * progress,
                 14,
                 0xFFFFFFFF);
             fontRendererObj.drawString(
@@ -357,11 +346,6 @@ public class GuiWarpStone extends GuiScreen {
                 height / 2 - 85,
                 0xe33042,
                 true);
-            for (GuiButton btn : buttonList) {
-                if (btn instanceof GuiButtonWaystone) {
-                    btn.enabled = false;
-                }
-            }
         }
 
         this.searchBar.drawTextBox();
@@ -549,10 +533,18 @@ public class GuiWarpStone extends GuiScreen {
         }
     }
 
+    public boolean isFree() {
+        return isFree;
+    }
+
+    public boolean canWarpTo(WaystoneEntry waystone) {
+        return isFree ? PlayerWaystoneData.canFreeWarp(Minecraft.getMinecraft().thePlayer)
+            : PlayerWaystoneData.canUseWarpStone(Minecraft.getMinecraft().thePlayer, waystone);
+    }
+
     private boolean hasCooldownBypassWaystone() {
-        for (GuiButton btn : buttonList) {
-            if (btn instanceof GuiButtonWaystone && PlayerWaystoneData
-                .canUseWarpStone(Minecraft.getMinecraft().thePlayer, ((GuiButtonWaystone) btn).getWaystone())) {
+        for (GuiButtonWaystone btn : lstEntries) {
+            if (canWarpTo(btn.getWaystone())) {
                 return true;
             }
         }

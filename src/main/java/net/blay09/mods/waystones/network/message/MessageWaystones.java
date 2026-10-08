@@ -1,5 +1,6 @@
 package net.blay09.mods.waystones.network.message;
 
+import net.blay09.mods.waystones.util.WaystoneCooldown;
 import net.blay09.mods.waystones.util.WaystoneEntry;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -45,6 +46,11 @@ public class MessageWaystones implements IMessage {
         for (int i = 0; i < pinnedWaystones.length; i++) {
             pinnedWaystones[i] = ByteBufUtils.readUTF8String(buf);
         }
+        // Compare elapsed time on the server with the client's own clock, not absolute timestamps.
+        long serverTime = buf.readLong();
+        long clientTime = System.currentTimeMillis();
+        lastFreeWarp = WaystoneCooldown.toClientTime(lastFreeWarp, serverTime, clientTime);
+        lastWarpStoneUse = WaystoneCooldown.toClientTime(lastWarpStoneUse, serverTime, clientTime);
     }
 
     @Override
@@ -64,6 +70,7 @@ public class MessageWaystones implements IMessage {
         for (String s : pinnedWaystones) {
             ByteBufUtils.writeUTF8String(buf, s);
         }
+        buf.writeLong(System.currentTimeMillis());
     }
 
     public WaystoneEntry[] getEntries() {

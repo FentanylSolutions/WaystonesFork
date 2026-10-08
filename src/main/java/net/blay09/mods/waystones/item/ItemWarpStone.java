@@ -90,21 +90,18 @@ public class ItemWarpStone extends Item {
     @Override
     @SideOnly(Side.CLIENT)
     public int getDisplayDamage(ItemStack itemStack) {
-        long timeSince = System.currentTimeMillis() - PlayerWaystoneData.getLastWarpStoneUse(
+        float progress = PlayerWaystoneData.getWarpStoneCooldownProgress(
             FMLClientHandler.instance()
                 .getClientPlayerEntity());
-        float percentage = (float) timeSince / (float) (Waystones.getConfig().warpStoneCooldown * 1000);
-        return 100 - (int) (Math.max(0, Math.min(1, percentage)) * 100);
+        return 100 - (int) (progress * 100);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     @SuppressWarnings("unchecked")
     public void addInformation(ItemStack itemStack, EntityPlayer player, List list, boolean debug) {
-        long timeSince = System.currentTimeMillis() - PlayerWaystoneData.getLastWarpStoneUse(
-            FMLClientHandler.instance()
-                .getClientPlayerEntity());
-        int secondsLeft = (int) ((Waystones.getConfig().warpStoneCooldown * 1000 - timeSince) / 1000);
+        long remaining = PlayerWaystoneData.getWarpStoneCooldownRemaining(player);
+        int secondsLeft = (int) ((remaining + 999L) / 1000L);
         if (secondsLeft > 0) {
             list.add(EnumChatFormatting.GRAY + I18n.format("tooltip.waystones:cooldownLeft", secondsLeft));
         }

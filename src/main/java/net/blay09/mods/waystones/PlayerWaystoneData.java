@@ -3,6 +3,7 @@ package net.blay09.mods.waystones;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.blay09.mods.waystones.util.WaystoneCooldown;
 import net.blay09.mods.waystones.util.WaystoneEntry;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -121,13 +122,32 @@ public class PlayerWaystoneData {
     }
 
     public static boolean canFreeWarp(EntityPlayer player) {
-        return System.currentTimeMillis() - getLastFreeWarp(player)
-            > Waystones.getConfig().teleportButtonCooldown * 1000L;
+        return getFreeWarpCooldownRemaining(player) == 0L;
     }
 
     public static boolean canUseWarpStone(EntityPlayer player) {
-        return (player.capabilities.isCreativeMode) || (System.currentTimeMillis() - getLastWarpStoneUse(player)
-            > Waystones.getConfig().warpStoneCooldown * 1000L);
+        return player.capabilities.isCreativeMode || getWarpStoneCooldownRemaining(player) == 0L;
+    }
+
+    public static long getFreeWarpCooldownRemaining(EntityPlayer player) {
+        return WaystoneCooldown.getRemainingMillis(
+            getLastFreeWarp(player),
+            Waystones.getConfig().teleportButtonCooldown,
+            System.currentTimeMillis());
+    }
+
+    public static long getWarpStoneCooldownRemaining(EntityPlayer player) {
+        return WaystoneCooldown.getRemainingMillis(
+            getLastWarpStoneUse(player),
+            Waystones.getConfig().warpStoneCooldown,
+            System.currentTimeMillis());
+    }
+
+    public static float getWarpStoneCooldownProgress(EntityPlayer player) {
+        return WaystoneCooldown.getProgress(
+            getLastWarpStoneUse(player),
+            Waystones.getConfig().warpStoneCooldown,
+            System.currentTimeMillis());
     }
 
     public static boolean shouldIgnoreWarpStoneCooldown(WaystoneEntry waystone) {
