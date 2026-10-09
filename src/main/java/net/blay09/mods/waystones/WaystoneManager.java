@@ -124,6 +124,7 @@ public class WaystoneManager {
                     waystoneData.getLastServerWaystoneName(),
                     waystoneData.getLastFreeWarp(),
                     waystoneData.getLastWarpStoneUse(),
+                    waystoneData.getLastWaystoneUse(),
                     waystoneData.getPinnedWaystones()),
                 (EntityPlayerMP) player);
         }

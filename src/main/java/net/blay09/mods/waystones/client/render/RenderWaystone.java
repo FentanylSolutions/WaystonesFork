@@ -101,11 +101,11 @@ public class RenderWaystone extends TileEntitySpecialRenderer {
             return 1f; // fully charged if not in world
         }
         if (PlayerWaystoneData
-            .shouldIgnoreWarpStoneCooldown(WaystoneManager.getServerWaystone(tileWaystone.getWaystoneName()))) {
+            .shouldIgnoreCooldown(WaystoneManager.getServerWaystone(tileWaystone.getWaystoneName()))) {
             return 1f;
         }
 
-        return PlayerWaystoneData.getWarpStoneCooldownProgress(Minecraft.getMinecraft().thePlayer);
+        return PlayerWaystoneData.getWaystoneCooldownProgress(Minecraft.getMinecraft().thePlayer);
     }
 
     @Override

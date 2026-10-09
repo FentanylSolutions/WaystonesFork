@@ -5,7 +5,6 @@ import net.blay09.mods.waystones.WaystoneManager;
 import net.blay09.mods.waystones.Waystones;
 import net.blay09.mods.waystones.network.NetworkHandler;
 import net.blay09.mods.waystones.network.message.MessagePinWaystone;
-import net.blay09.mods.waystones.network.message.MessageWarpStone;
 import net.blay09.mods.waystones.util.ClientUtil;
 import net.blay09.mods.waystones.util.WaystoneEntry;
 import net.minecraft.client.Minecraft;
@@ -226,7 +225,7 @@ public class GuiButtonWaystone extends GuiButton {
         }
     }
 
-    public void mouseClicked(int mouseX, int mouseY, int mouseButton, boolean isFree) {
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
             if (ClientUtil.mouseOverArea(mouseX, mouseY, crossButtonX, buttonY, sideButtonSize, sideButtonSize)) {
                 if (waystone.isGlobal()) {
@@ -250,8 +249,6 @@ public class GuiButtonWaystone extends GuiButton {
             return;
         }
 
-        NetworkHandler.channel.sendToServer(new MessageWarpStone(waystone, isFree));
-        Minecraft.getMinecraft()
-            .displayGuiScreen(null);
+        parentGui.teleportTo(waystone);
     }
 }

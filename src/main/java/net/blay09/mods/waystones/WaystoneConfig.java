@@ -28,6 +28,7 @@ public class WaystoneConfig {
     public boolean allowWarpStone;
 
     public int warpStoneCooldown;
+    public int waystoneCooldown;
 
     public boolean interDimension;
 
@@ -89,7 +90,7 @@ public class WaystoneConfig {
             300,
             0,
             86400,
-            "The cooldown between usages of the teleport button in seconds.");
+            "The cooldown between usages of the inventory teleport button in seconds. Independent of placed waystones and the Warp Stone item.");
         teleportButtonReturnOnly = config.getBoolean(
             "teleportButtonReturnOnly",
             Categories.general,
@@ -142,7 +143,14 @@ public class WaystoneConfig {
             300,
             0,
             86400,
-            "The cooldown between usages of the Warp Stone and Waystone in seconds.");
+            "The cooldown between usages of the handheld Warp Stone item in seconds. Independent of placed waystones and the inventory teleport button.");
+        waystoneCooldown = config.getInt(
+            "waystoneCooldown",
+            Categories.general,
+            0,
+            0,
+            86400,
+            "The cooldown between teleports from placed waystones in seconds. Independent of the Warp Stone item and inventory teleport button. Set to 0 to disable.");
 
         setSpawnPoint = config.getBoolean(
             "setSpawnPoint",
@@ -340,6 +348,7 @@ public class WaystoneConfig {
         config.teleportButtonCooldown = buf.readInt();
         config.teleportButtonReturnOnly = buf.readBoolean();
         config.warpStoneCooldown = buf.readInt();
+        config.waystoneCooldown = buf.readInt();
         config.interDimension = buf.readBoolean();
         config.globalInterDimension = buf.readBoolean();
         config.creativeModeOnly = buf.readBoolean();
@@ -379,6 +388,7 @@ public class WaystoneConfig {
         buf.writeInt(teleportButtonCooldown);
         buf.writeBoolean(teleportButtonReturnOnly);
         buf.writeInt(warpStoneCooldown);
+        buf.writeInt(waystoneCooldown);
         buf.writeBoolean(interDimension);
         buf.writeBoolean(globalInterDimension);
         buf.writeBoolean(creativeModeOnly);

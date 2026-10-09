@@ -166,10 +166,14 @@ public class GuiWarpStone extends GuiScreen {
     @Override
     protected void actionPerformed(GuiButton button) {
         if (button instanceof GuiButtonWaystone) {
-            NetworkHandler.channel
-                .sendToServer(new MessageWarpStone(((GuiButtonWaystone) button).getWaystone(), isFree));
-            mc.displayGuiScreen(null);
+            teleportTo(((GuiButtonWaystone) button).getWaystone());
         }
+    }
+
+    public void teleportTo(WaystoneEntry waystone) {
+        WaystoneEntry origin = currentWaystone != null ? new WaystoneEntry(currentWaystone) : null;
+        NetworkHandler.channel.sendToServer(new MessageWarpStone(waystone, isFree, origin));
+        mc.displayGuiScreen(null);
     }
 
     @Override
@@ -327,12 +331,7 @@ public class GuiWarpStone extends GuiScreen {
                 cantWarpStrWidth + 4,
                 14,
                 0x32FFFFFF);
-            float progress = isFree
-                ? WaystoneCooldown.getProgress(
-                    PlayerWaystoneData.getLastFreeWarp(Minecraft.getMinecraft().thePlayer),
-                    Waystones.getConfig().teleportButtonCooldown,
-                    System.currentTimeMillis())
-                : PlayerWaystoneData.getWarpStoneCooldownProgress(Minecraft.getMinecraft().thePlayer);
+            float progress = getCooldownProgress();
             ClientUtil.drawSolidRect(
                 Tessellator.instance,
                 (double) width / 2 - (double) cantWarpStrWidth / 2 - 2,
@@ -538,8 +537,24 @@ public class GuiWarpStone extends GuiScreen {
     }
 
     public boolean canWarpTo(WaystoneEntry waystone) {
-        return isFree ? PlayerWaystoneData.canFreeWarp(Minecraft.getMinecraft().thePlayer)
+        if (isFree) {
+            return PlayerWaystoneData.canFreeWarp(Minecraft.getMinecraft().thePlayer);
+        }
+        return source == TeleportSource.WAYSTONE
+            ? PlayerWaystoneData.canUseWaystone(Minecraft.getMinecraft().thePlayer, waystone)
             : PlayerWaystoneData.canUseWarpStone(Minecraft.getMinecraft().thePlayer, waystone);
+    }
+
+    private float getCooldownProgress() {
+        if (isFree) {
+            return WaystoneCooldown.getProgress(
+                PlayerWaystoneData.getLastFreeWarp(Minecraft.getMinecraft().thePlayer),
+                Waystones.getConfig().teleportButtonCooldown,
+                System.currentTimeMillis());
+        }
+        return source == TeleportSource.WAYSTONE
+            ? PlayerWaystoneData.getWaystoneCooldownProgress(Minecraft.getMinecraft().thePlayer)
+            : PlayerWaystoneData.getWarpStoneCooldownProgress(Minecraft.getMinecraft().thePlayer);
     }
 
     private boolean hasCooldownBypassWaystone() {
@@ -635,7 +650,7 @@ public class GuiWarpStone extends GuiScreen {
         }
 
         this.searchBar.mouseClicked(mouseX, mouseY, mouseButton);
-        this.waystoneList.mouseClicked(mouseX, mouseY, mouseButton, isFree);
+        this.waystoneList.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override

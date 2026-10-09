@@ -185,8 +185,8 @@ public class ClientProxy extends CommonProxy {
         if (WaystoneManager.getKnownWaystone(tileWaystone.getWaystoneName()) != null
             || WaystoneManager.getServerWaystone(tileWaystone.getWaystoneName()) != null) {
             if (PlayerWaystoneData
-                .shouldIgnoreWarpStoneCooldown(WaystoneManager.getServerWaystone(tileWaystone.getWaystoneName()))
-                || PlayerWaystoneData.canUseWarpStone(Minecraft.getMinecraft().thePlayer)) {
+                .shouldIgnoreCooldown(WaystoneManager.getServerWaystone(tileWaystone.getWaystoneName()))
+                || PlayerWaystoneData.canUseWaystone(Minecraft.getMinecraft().thePlayer)) {
                 String particle = tileWaystone.getVariant() == TileWaystone.VARIANT_END ? "smoke" : "portal";
                 world.spawnParticle(
                     particle,
@@ -214,7 +214,7 @@ public class ClientProxy extends CommonProxy {
         if (player == null || player.capabilities.isCreativeMode) {
             return (int) (maxLightLevel * 15f);
         }
-        float progress = PlayerWaystoneData.getWarpStoneCooldownProgress(player);
+        float progress = PlayerWaystoneData.getWaystoneCooldownProgress(player);
         return (int) (progress * maxLightLevel * 15f);
     }
 

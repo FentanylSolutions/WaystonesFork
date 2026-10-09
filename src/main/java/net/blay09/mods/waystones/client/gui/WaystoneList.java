@@ -246,7 +246,7 @@ public class WaystoneList {
         }
     }
 
-    public void mouseClicked(int mouseX, int mouseY, int mouseButton, boolean isFree) {
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (mouseButton != 0) {
             return;
         }
@@ -258,7 +258,7 @@ public class WaystoneList {
 
         if (index >= 0 && index < entries.size()) {
             GuiButtonWaystone button = entries.get(index);
-            button.mouseClicked(mouseX, mouseY, mouseButton, isFree);
+            button.mouseClicked(mouseX, mouseY, mouseButton);
         }
     }
 

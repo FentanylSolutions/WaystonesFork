@@ -36,7 +36,7 @@ Teleport back to activated waystones. For Survival, Adventure or Servers.
 * Automatic activation upon naming.
 * Configurable [Village Names](https://modrinth.com/mod/village-names) mod compatibility.
 * Configurable teleportation XP level cost. Flat cost, distance cost, flat cross-dim cost.
-* Configurable global teleportation cooldown. Cooldown status indicator.
+* Configurable independent teleportation cooldowns. Cooldown status indicator.
 * Waystone list sorting by Name and Distance.
 * Waystone list filtering.
 * "Undiscovering/Forgetting" Waystones.
@@ -45,6 +45,9 @@ Teleport back to activated waystones. For Survival, Adventure or Servers.
 * Global Waystones are stored in the save NBT, no more conflicts.
 * Sandstone, Mossy, (Mossy) Stonebrick, Netherbrick, Endstone Waystone variants.
 * Journeymap and Xaero's Minimap integration: adding waypoints upon interaction with Waystones
+
+### Teleport cooldowns:
+`waystoneCooldown` sets the cooldown for placed waystones in seconds (default `0`, disabled). The handheld Warp Stone and inventory button use separate cooldowns.
 
 ### Worldgen configuration system:
 You can define a list of rules under the `structureWaystoneRules` key in the config. Each rule can have the following properties:

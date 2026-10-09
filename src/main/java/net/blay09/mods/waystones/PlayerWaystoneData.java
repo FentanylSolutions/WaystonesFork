@@ -17,6 +17,7 @@ public class PlayerWaystoneData {
     public static final String WAYSTONE_LIST = "WaystoneList";
     public static final String LAST_FREE_WARP = "LastFreeWarp";
     public static final String LAST_WARP_STONE_USE = "LastWarpStoneUse";
+    public static final String LAST_WAYSTONE_USE = "LastWaystoneUse";
     public static final String LAST_SERVER_WAYSTONE = "LastWaystone";
     public static final String PINNED_WAYSTONES = "PinnedWaystone";
 
@@ -24,14 +25,16 @@ public class PlayerWaystoneData {
     private final String lastServerWaystoneName;
     private final long lastFreeWarp;
     private final long lastWarpStoneUse;
+    private final long lastWaystoneUse;
     private final String[] pinnedWaystones;
 
     public PlayerWaystoneData(WaystoneEntry[] entries, String lastServerWaystoneName, long lastFreeWarp,
-        long lastWarpStoneUse, String[] pinnedWaystones) {
+        long lastWarpStoneUse, long lastWaystoneUse, String[] pinnedWaystones) {
         this.entries = entries;
         this.lastServerWaystoneName = lastServerWaystoneName;
         this.lastFreeWarp = lastFreeWarp;
         this.lastWarpStoneUse = lastWarpStoneUse;
+        this.lastWaystoneUse = lastWaystoneUse;
         this.pinnedWaystones = pinnedWaystones;
     }
 
@@ -45,6 +48,10 @@ public class PlayerWaystoneData {
 
     public long getLastWarpStoneUse() {
         return lastWarpStoneUse;
+    }
+
+    public long getLastWaystoneUse() {
+        return lastWaystoneUse;
     }
 
     public static NBTTagCompound getWaystonesTag(EntityPlayer player) {
@@ -73,16 +80,23 @@ public class PlayerWaystoneData {
         String lastServerWaystoneName = tagCompound.getString(LAST_SERVER_WAYSTONE);
         long lastFreeWarp = tagCompound.getLong(LAST_FREE_WARP);
         long lastWarpStoneUse = tagCompound.getLong(LAST_WARP_STONE_USE);
+        long lastWaystoneUse = tagCompound.getLong(LAST_WAYSTONE_USE);
         NBTTagList pinnedTagList = tagCompound.getTagList(PINNED_WAYSTONES, Constants.NBT.TAG_STRING);
         String[] pinnedWaystones = new String[pinnedTagList.tagCount()];
         for (int i = 0; i < pinnedWaystones.length; i++) {
             pinnedWaystones[i] = pinnedTagList.getStringTagAt(i);
         }
-        return new PlayerWaystoneData(entries, lastServerWaystoneName, lastFreeWarp, lastWarpStoneUse, pinnedWaystones);
+        return new PlayerWaystoneData(
+            entries,
+            lastServerWaystoneName,
+            lastFreeWarp,
+            lastWarpStoneUse,
+            lastWaystoneUse,
+            pinnedWaystones);
     }
 
     public static void store(EntityPlayer player, WaystoneEntry[] entries, String lastServerWaystoneName,
-        long lastFreeWarp, long lastWarpStoneUse, String[] pinnedWaystones) {
+        long lastFreeWarp, long lastWarpStoneUse, long lastWaystoneUse, String[] pinnedWaystones) {
         NBTTagCompound tagCompound = getOrCreateWaystonesTag(player);
         NBTTagList tagList = new NBTTagList();
         for (WaystoneEntry entry : entries) {
@@ -92,6 +106,7 @@ public class PlayerWaystoneData {
         tagCompound.setString(LAST_SERVER_WAYSTONE, lastServerWaystoneName);
         tagCompound.setLong(LAST_FREE_WARP, lastFreeWarp);
         tagCompound.setLong(LAST_WARP_STONE_USE, lastWarpStoneUse);
+        tagCompound.setLong(LAST_WAYSTONE_USE, lastWaystoneUse);
         NBTTagList pinnedList = new NBTTagList();
         for (String s : pinnedWaystones) {
             pinnedList.appendTag(new NBTTagString(s));
@@ -129,6 +144,10 @@ public class PlayerWaystoneData {
         return player.capabilities.isCreativeMode || getWarpStoneCooldownRemaining(player) == 0L;
     }
 
+    public static boolean canUseWaystone(EntityPlayer player) {
+        return player.capabilities.isCreativeMode || getWaystoneCooldownRemaining(player) == 0L;
+    }
+
     public static long getFreeWarpCooldownRemaining(EntityPlayer player) {
         return WaystoneCooldown.getRemainingMillis(
             getLastFreeWarp(player),
@@ -150,12 +169,30 @@ public class PlayerWaystoneData {
             System.currentTimeMillis());
     }
 
-    public static boolean shouldIgnoreWarpStoneCooldown(WaystoneEntry waystone) {
+    public static long getWaystoneCooldownRemaining(EntityPlayer player) {
+        return WaystoneCooldown.getRemainingMillis(
+            getLastWaystoneUse(player),
+            Waystones.getConfig().waystoneCooldown,
+            System.currentTimeMillis());
+    }
+
+    public static float getWaystoneCooldownProgress(EntityPlayer player) {
+        return WaystoneCooldown.getProgress(
+            getLastWaystoneUse(player),
+            Waystones.getConfig().waystoneCooldown,
+            System.currentTimeMillis());
+    }
+
+    public static boolean shouldIgnoreCooldown(WaystoneEntry waystone) {
         return waystone != null && waystone.isGlobal() && Waystones.getConfig().globalNoCooldown;
     }
 
     public static boolean canUseWarpStone(EntityPlayer player, WaystoneEntry waystone) {
-        return shouldIgnoreWarpStoneCooldown(waystone) || canUseWarpStone(player);
+        return shouldIgnoreCooldown(waystone) || canUseWarpStone(player);
+    }
+
+    public static boolean canUseWaystone(EntityPlayer player, WaystoneEntry waystone) {
+        return shouldIgnoreCooldown(waystone) || canUseWaystone(player);
     }
 
     public static void setLastFreeWarp(EntityPlayer player, long lastFreeWarp) {
@@ -176,6 +213,14 @@ public class PlayerWaystoneData {
     public static long getLastWarpStoneUse(EntityPlayer player) {
         return PlayerWaystoneData.getWaystonesTag(player)
             .getLong(PlayerWaystoneData.LAST_WARP_STONE_USE);
+    }
+
+    public static void setLastWaystoneUse(EntityPlayer player, long lastWaystoneUse) {
+        getOrCreateWaystonesTag(player).setLong(LAST_WAYSTONE_USE, lastWaystoneUse);
+    }
+
+    public static long getLastWaystoneUse(EntityPlayer player) {
+        return getWaystonesTag(player).getLong(LAST_WAYSTONE_USE);
     }
 
     public String getLastServerWaystoneName() {
